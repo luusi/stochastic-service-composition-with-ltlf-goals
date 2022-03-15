@@ -6,7 +6,7 @@ from mdp_dp_rl.processes.mdp import MDP
 
 from stochastic_service_composition.services import Service, build_system_service
 from stochastic_service_composition.target import Target
-from stochastic_service_composition.types import Action, State, MDPDynamics
+from stochastic_service_composition.types import Action, MDPDynamics, State
 
 COMPOSITION_MDP_INITIAL_STATE = 0
 COMPOSITION_MDP_INITIAL_ACTION = "initial"

@@ -5,9 +5,9 @@ from typing import Deque, Set, Tuple
 
 from stochastic_service_composition.types import (
     Action,
+    MDPDynamics,
     State,
     TransitionFunction,
-    MDPDynamics,
 )
 
 
@@ -194,7 +194,7 @@ def build_system_service(*services: Service) -> Service:
         visited.add(current_state)
 
         new_states.add(current_state)
-        #check if system_state is final
+        # check if system_state is final
         if all(
             component_i in services[i].final_states
             for i, component_i in enumerate(current_state)

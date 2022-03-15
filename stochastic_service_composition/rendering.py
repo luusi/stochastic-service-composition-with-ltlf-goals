@@ -111,7 +111,9 @@ def mdp_to_graphviz(
             graph.node(state2str(state), root="true", shape=shape)
         else:
             graph.node(state2str(state), shape=shape)
-    graph.edge("fake", state2str(COMPOSITION_MDP_INITIAL_STATE), style="bold")
+
+    if COMPOSITION_MDP_INITIAL_STATE in mdp.all_states:
+        graph.edge("fake", state2str(COMPOSITION_MDP_INITIAL_STATE), style="bold")
 
     for start, outgoing in mdp.transitions.items():
         for action, next_states in outgoing.items():

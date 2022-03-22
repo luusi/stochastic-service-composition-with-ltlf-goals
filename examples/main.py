@@ -23,8 +23,8 @@ if __name__ == "__main__":
     cast(SymbolicDFA, automaton).to_graphviz().render("automaton")
     mdp_to_graphviz(mdp).render("mdp")
 
-    a = Service({"s1"}, {"a"}, {"s1"}, "s1", {"s1": {"a": ({"s1": 1.0}, 1.0)}})
-    b = Service({"s1"}, {"b"}, {"s1"}, "s1", {"s1": {"b": ({"s1": 1.0}, 1.0)}})
+    a = Service({"s1"}, {"a"}, {"s1"}, "s1", {"s1": {"a": ({"s1": 1.0}, (1.0, 1.0))}})
+    b = Service({"s1"}, {"b"}, {"s1"}, "s1", {"s1": {"b": ({"s1": 1.0}, (2.0, 2.0))}})
     service_to_graphviz(a).render("service_a")
     service_to_graphviz(b).render("service_b")
 

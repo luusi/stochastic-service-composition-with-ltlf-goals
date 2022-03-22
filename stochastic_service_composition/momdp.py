@@ -1,9 +1,11 @@
 from collections import deque
 from typing import Deque, Dict, List, Tuple
 
+import numpy as np
+
 from stochastic_service_composition.dfa_target import MdpDfa, guard_to_symbol
 from stochastic_service_composition.services import Service, build_system_service
-from stochastic_service_composition.types import Action, MDPDynamics, State
+from stochastic_service_composition.types import Action, MDPDynamics, State, MOMDPDynamics
 
 
 def get_system_transition_function_by_symbol(
@@ -51,36 +53,36 @@ def compute_final_mdp(
         cur_system_state, cur_dfa_state = cur_state
         trans_dist = {}
 
-        prop_formula_from_dfa_state = mdp_ltlf.transitions[cur_dfa_state].items()
-        for prop_formula, dest_state_prob in prop_formula_from_dfa_state:
-            assert len(dest_state_prob) == 1
-            next_dfa_state, prob = list(dest_state_prob.items())[0]
-            goal_reward = weights[0] * mdp_ltlf.rewards[cur_dfa_state][prop_formula]
-            if next_dfa_state == mdp_ltlf.failure_state:
-                continue
-            symbol = prop_formula
-            next_system_state_trans = system_transition_function_by_symbol[
-                cur_system_state
-            ].get(symbol, None)
-            if next_system_state_trans is None:
-                continue
-            for service_id, (
-                next_system_state_dist,
-                next_system_reward,
-            ) in next_system_state_trans.items():
-                weighted_next_system_reward = (
-                    weights[service_id + 1] * next_system_reward
-                )
-                final_reward = goal_reward + weighted_next_system_reward
-                for next_system_state, prob in next_system_state_dist.items():
-                    assert prob > 0.0
-                    next_state = (next_system_state, next_dfa_state)
-                    trans_dist.setdefault((symbol, service_id), ({}, final_reward))[0][
-                        next_state
-                    ] = prob
-                    if next_state not in visited and next_state not in to_be_visited:
-                        queue.append(next_state)
-                        to_be_visited.add(next_state)
+        next_system_state_trans = system_service.transition_function[
+            cur_system_state
+        ].items()
+
+        # iterate over all available actions of system service
+        # in case symbol is in DFA available actions, progress DFA state component
+        for (symbol, service_id), next_state_info in next_system_state_trans:
+            next_system_state_distr, reward_vector = next_state_info
+            system_reward = sum(weights[i + 1] * r for i, r in enumerate(reward_vector))
+
+            if symbol not in mdp_ltlf.all_actions:
+                # it is a tau action
+                next_dfa_state = cur_dfa_state
+                goal_reward = 0.0
+            else:
+                symbol_to_next_dfa_states = mdp_ltlf.transitions[cur_dfa_state]
+                next_dfa_state_distr = symbol_to_next_dfa_states[symbol]
+                next_dfa_state, _prob = list(next_dfa_state_distr.items())[0]
+                goal_reward = weights[0] * mdp_ltlf.rewards[cur_dfa_state][symbol]
+            final_reward = goal_reward + system_reward
+
+            for next_system_state, prob in next_system_state_distr.items():
+                assert prob > 0.0
+                next_state = (next_system_state, next_dfa_state)
+                trans_dist.setdefault((symbol, service_id), ({}, final_reward))[0][
+                    next_state
+                ] = prob
+                if next_state not in visited and next_state not in to_be_visited:
+                    queue.append(next_state)
+                    to_be_visited.add(next_state)
 
         transition_function[cur_state] = trans_dist
 

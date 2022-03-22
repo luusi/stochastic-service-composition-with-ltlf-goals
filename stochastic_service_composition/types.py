@@ -12,4 +12,5 @@ Reward = float
 Prob = float
 TransitionFunction = Dict[State, Dict[Action, State]]
 MDPDynamics = Dict[State, Dict[Action, Tuple[Dict[State, Prob], Reward]]]
+MOMDPDynamics = Dict[State, Dict[Action, Tuple[Dict[State, Prob], Tuple[Reward, ...]]]]
 TargetDynamics = Dict[State, Dict[Action, Tuple[State, Prob, Reward]]]

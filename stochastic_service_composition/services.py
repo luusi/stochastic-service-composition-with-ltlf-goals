@@ -1,13 +1,13 @@
 """This module contains the implementation of the service abstraction."""
 
 from collections import deque
-from typing import Deque, Set, Tuple
+from typing import Deque, Set, Tuple, Optional
 
 from stochastic_service_composition.types import (
     Action,
     MDPDynamics,
     State,
-    TransitionFunction,
+    TransitionFunction, MOMDPDynamics,
 )
 
 
@@ -20,7 +20,7 @@ class Service:
         actions: Set[Action],
         final_states: Set[State],
         initial_state: State,
-        transition_function: MDPDynamics,
+        transition_function: MOMDPDynamics,
     ):
         """
         Initialize the service.
@@ -38,6 +38,7 @@ class Service:
         self.final_states = final_states
         self.initial_state = initial_state
         self.transition_function = transition_function
+        self.__post_init__()
 
     def __post_init__(self):
         """Do post-initialization checks."""
@@ -83,17 +84,24 @@ class Service:
         - check that every state is contained in the set of states.
         - check that every action is contained in the set of actions.
         """
+        # set to None as the first time we don't know it yet
+        nb_rewards: Optional[int] = None
         for start_state, transitions_by_action in self.transition_function.items():
             assert (
-                start_state not in self.states
+                start_state in self.states
             ), f"state {start_state} is not in the set of states"
-            for action, next_state in transitions_by_action.items():
+            for action, (next_state_dist, rewards) in transitions_by_action.items():
                 assert (
-                    next_state in self.states
-                ), f"state {next_state} is not in the set of states"
-                assert (
-                    action in self.actions
+                        action in self.actions
                 ), f"action {action} is not in the set of actions"
+                assert sum(next_state_dist.values()) == 1.0
+                for next_state, prob in next_state_dist.items():
+                    assert (
+                        next_state in self.states
+                    ), f"state {next_state} is not in the set of states"
+                if nb_rewards is None:
+                    nb_rewards = len(rewards)
+                assert nb_rewards == len(rewards)
 
 
 def build_deterministic_service_from_transitions(
@@ -114,14 +122,14 @@ def build_deterministic_service_from_transitions(
     """
     states = set()
     actions = set()
-    new_transition_function: MDPDynamics = {}
+    new_transition_function: MOMDPDynamics = {}
     for start_state, transitions_by_action in transition_function.items():
         states.add(start_state)
         new_transition_function[start_state] = {}
         for action, next_state in transitions_by_action.items():
             actions.add(action)
             states.add(next_state)
-            new_transition_function[start_state][action] = ({next_state: 1.0}, 0.0)
+            new_transition_function[start_state][action] = ({next_state: 1.0}, (0.0, ))
 
     unreachable_final_states = final_states.difference(states)
     assert (
@@ -135,7 +143,7 @@ def build_deterministic_service_from_transitions(
 
 
 def build_service_from_transitions(
-    transition_function: MDPDynamics,
+    transition_function: MOMDPDynamics,
     initial_state: State,
     final_states: Set[State],
 ) -> Service:
@@ -182,7 +190,7 @@ def build_system_service(*services: Service) -> Service:
     new_initial_state: Tuple[State, ...] = tuple(
         service.initial_state for service in services
     )
-    new_transition_function: MDPDynamics = {}
+    new_transition_function: MOMDPDynamics = {}
 
     queue: Deque[Tuple[State, ...]] = deque()
     queue.append(new_initial_state)

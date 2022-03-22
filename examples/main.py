@@ -24,7 +24,7 @@ if __name__ == "__main__":
     mdp_to_graphviz(mdp).render("mdp")
 
     a = Service({"s1"}, {"a"}, {"s1"}, "s1", {"s1": {"a": ({"s1": 1.0}, (1.0, 1.0))}})
-    b = Service({"s1"}, {"b"}, {"s1"}, "s1", {"s1": {"b": ({"s1": 1.0}, (2.0, 2.0))}})
+    b = Service({"s1"}, {"b", "taub"}, {"s1"}, "s1", {"s1": {"b": ({"s1": 1.0}, (2.0, 2.0)), "taub": ({"s1": 1.0}, (0.0, 0.0))}})
     service_to_graphviz(a).render("service_a")
     service_to_graphviz(b).render("service_b")
 

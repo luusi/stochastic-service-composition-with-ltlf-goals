@@ -4,10 +4,30 @@ from typing import Any, Mapping, Set, Tuple
 from mdp_dp_rl.processes.mdp import MDP
 from mdp_dp_rl.utils.generic_typevars import A, S
 from pythomata.core import DFA
-from sympy.logic.boolalg import BooleanTrue
+from sympy import Symbol
+from sympy.logic.boolalg import And, BooleanFunction, BooleanTrue, Or
 
 from stochastic_service_composition.composition import DEFAULT_GAMMA
 from stochastic_service_composition.types import MDPDynamics
+
+
+def guard_to_symbol(prop_formula: BooleanFunction) -> Set[str]:
+    """From guard to symbol."""
+    if isinstance(prop_formula, Symbol):
+        return {str(prop_formula)}
+    elif isinstance(prop_formula, And):
+        symbol_args = [arg for arg in prop_formula.args if isinstance(arg, Symbol)]
+        assert len(symbol_args) == 1
+        return {str(symbol_args[0])}
+    elif isinstance(prop_formula, Or):
+        operands_as_symbols = [
+            symb for arg in prop_formula.args for symb in guard_to_symbol(arg)
+        ]
+        operands_as_symbols = list(filter(lambda x: x is not None, operands_as_symbols))
+        assert len(operands_as_symbols) > 0
+        return set(operands_as_symbols)
+    # None case
+    return None
 
 
 class MdpDfa(MDP):
@@ -28,15 +48,15 @@ class MdpDfa(MDP):
 
 def mdp_from_dfa(dfa: DFA, reward: float = 2.0, gamma: float = DEFAULT_GAMMA) -> MdpDfa:
     transition_function: MDPDynamics = {}
-
+    failure_state = _find_failure_state(dfa)
     for _start in dfa.states:
         for start, action, end in dfa.get_transitions_from(_start):
-            # TODO: with declare assumption
-            # symb = tuple([arg for arg in action.args if not isinstance(arg, Not)])
-            # if len(symb) == 1:
-            #     symb = str(symb[0])
-            dest = ({end: 1.0}, reward if end in dfa.accepting_states else 0.0)
-            transition_function.setdefault(start, {}).setdefault(action, dest)
+            if end == failure_state:
+                continue
+            symbols = guard_to_symbol(action)
+            for symbol in symbols:
+                dest = ({end: 1.0}, reward if end in dfa.accepting_states else 0.0)
+                transition_function.setdefault(start, {}).setdefault(symbol, dest)
 
     result = MdpDfa(transition_function, gamma)
     result.initial_state = dfa.initial_state

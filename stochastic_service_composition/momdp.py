@@ -86,4 +86,6 @@ def compute_final_mdp(
 
         transition_function[cur_state] = trans_dist
 
-    return MdpDfa(transition_function, mdp_ltlf.gamma)
+    result = MdpDfa(transition_function, mdp_ltlf.gamma)
+    result.initial_state = initial_state
+    return result

@@ -10,7 +10,7 @@ from stochastic_service_composition.types import Action, MDPDynamics, State
 
 COMPOSITION_MDP_INITIAL_STATE = 0
 COMPOSITION_MDP_INITIAL_ACTION = "initial"
-COMPOSITION_MDP_UNDEFINED_ACTION = "undefined"
+COMPOSITION_MDP_UNDEFINED_ACTION = "failure"
 DEFAULT_GAMMA = 0.9
 
 

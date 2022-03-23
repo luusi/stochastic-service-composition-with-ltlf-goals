@@ -26,7 +26,7 @@ def weak_until(a, b):
 
 
 def absence_2(a):
-    return f"G({a} | G(!{a}))"
+    return f"G({a} -> XG(!{a}))"
 
 
 def exactly_once(a):
@@ -37,12 +37,12 @@ def alt_response(a, b):
     return f"(G({a} -> X[!](!{a} U {b})))"
 
 
-def alt_succession(a, b):
-    return f"({alt_response(a, b)} & {alt_precedence(a, b)})"
-
-
 def alt_precedence(a, b):
     return f"({weak_until(f'!{b}', a)} & G({b} -> X({weak_until(f'!{b}', a)})))"
+
+
+def alt_succession(a, b):
+    return f"({alt_response(a, b)} & {alt_precedence(a, b)})"
 
 
 def not_coexistence(a, b):
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         alt_precedence(ASSEMBLE_MOTOR, ELECTRIC_TEST),
         alt_precedence(ASSEMBLE_MOTOR, STATIC_TEST),
         not_coexistence(ELECTRIC_TEST, STATIC_TEST),
-        declare(ALL_SYMBOLS)
+        declare(ALL_SYMBOLS),
     ]
 
     formula_str = " & ".join(map(lambda s: f"({s})", declare_constraints))

@@ -17,7 +17,6 @@ def service_to_graphviz(
 ) -> Digraph:
     """
     Transform a service into a graphviz.Digraph object.
-
     :param service: the service object
     :param state2str: a callable that transforms states into strings
     :param action2str: a callable that transforms actions into strings
@@ -55,7 +54,6 @@ def target_to_graphviz(
 ) -> Digraph:
     """
     Transform a target into a graphviz.Digraph object.
-
     :param target: the target object
     :param state2str: a callable that transforms states into strings
     :param action2str: a callable that transforms actions into strings
@@ -95,7 +93,6 @@ def mdp_to_graphviz(
 ) -> Digraph:
     """
     Translate a composition-MDP instance into a Digraph.
-
     :param mdp: the composition-MDP object, obtained from composition.composition_mdp
     :param state2str: a callable that transforms states into strings
     :param action2str: a callable that transforms actions into strings
@@ -107,13 +104,13 @@ def mdp_to_graphviz(
 
     for state in mdp.all_states:
         shape = "doubleoctagon" if state in mdp.get_terminal_states() else "box"
-        if state == COMPOSITION_MDP_INITIAL_STATE:
+        if state == mdp.initial_state:
             graph.node(state2str(state), root="true", shape=shape)
         else:
             graph.node(state2str(state), shape=shape)
 
-    if COMPOSITION_MDP_INITIAL_STATE in mdp.all_states:
-        graph.edge("fake", state2str(COMPOSITION_MDP_INITIAL_STATE), style="bold")
+    if mdp.initial_state in mdp.all_states:
+        graph.edge("fake", state2str(mdp.initial_state), style="bold")
 
     for start, outgoing in mdp.transitions.items():
         for action, next_states in outgoing.items():

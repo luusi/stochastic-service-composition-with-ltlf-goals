@@ -12,6 +12,7 @@ from mdp_dp_rl.processes.mdp import MDP
 from mdp_dp_rl.processes.policy import Policy
 from mdp_dp_rl.utils.standard_typevars import VFDictType, QFDictType
 
+from stochastic_service_composition.dfa_target import MdpDfa
 from stochastic_service_composition.rendering import service_to_graphviz, target_to_graphviz, mdp_to_graphviz
 from stochastic_service_composition.services import Service
 from stochastic_service_composition.target import Target
@@ -40,6 +41,11 @@ def render_service(service: Service, format=_default_format):
 def render_target(target: Target, format=_default_format):
     digraph = target_to_graphviz(target)
     render_digraph(digraph, format)
+
+
+def render_mdp_dfa(mdp: MdpDfa, format= _default_format):
+    digraph= mdp_to_graphviz(mdp)
+    render_digraph(digraph)
 
 
 def render_composition_mdp(mdp: MDP, format=_default_format):

@@ -38,6 +38,13 @@ class Service:
         self.transition_function = transition_function
         self.__post_init__()
 
+    @property
+    def nb_rewards(self) -> int:
+        """Get the number of rewards."""
+        action_to_next_state_info = next(iter(self.transition_function.items()))[1]
+        next_state_dist, rewards = next(iter(action_to_next_state_info.items()))[1]
+        return len(rewards)
+
     def __post_init__(self):
         """Do post-initialization checks."""
         self._check_number_of_states_at_least_one()

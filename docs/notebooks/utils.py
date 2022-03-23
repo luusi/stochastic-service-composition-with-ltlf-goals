@@ -13,18 +13,19 @@ from mdp_dp_rl.processes.policy import Policy
 from mdp_dp_rl.utils.standard_typevars import VFDictType, QFDictType
 
 from stochastic_service_composition.dfa_target import MdpDfa
-from stochastic_service_composition.rendering import service_to_graphviz, target_to_graphviz, mdp_to_graphviz
+from stochastic_service_composition.rendering import (
+    service_to_graphviz,
+    target_to_graphviz,
+    mdp_to_graphviz,
+)
 from stochastic_service_composition.services import Service
 from stochastic_service_composition.target import Target
 
-_image_classes = {
-    "png": Image,
-    "svg": SVG
-}
+_image_classes = {"png": Image, "svg": SVG}
 _default_format = "png"
 
 
-def display_svgs(*filenames, format: str="png"):
+def display_svgs(*filenames, format: str = "png"):
     assert format in _image_classes, f"format '{format}' not supported"
     image_class = _image_classes[format]
     images = [image_class(f) for f in filenames]
@@ -43,8 +44,8 @@ def render_target(target: Target, format=_default_format):
     render_digraph(digraph, format)
 
 
-def render_mdp_dfa(mdp: MdpDfa, format= _default_format):
-    digraph= mdp_to_graphviz(mdp)
+def render_mdp_dfa(mdp: MdpDfa, format=_default_format):
+    digraph = mdp_to_graphviz(mdp)
     render_digraph(digraph)
 
 

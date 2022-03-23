@@ -28,7 +28,8 @@ def get_system_transition_function_by_symbol(
 def compute_final_mdp(
     mdp_ltlf: MdpDfa, services: List[Service], weights: List[float]
 ) -> MdpDfa:
-    assert len(weights) == len(services) + 1
+    assert all(service.nb_rewards for service in services)
+    assert len(weights) == services[0].nb_rewards + 1
 
     system_service = build_system_service(*services)
     system_transition_function_by_symbol = get_system_transition_function_by_symbol(
@@ -67,9 +68,15 @@ def compute_final_mdp(
                 # it is a tau action
                 next_dfa_state = cur_dfa_state
                 goal_reward = 0.0
+            # not a tau action -> check we can
+            elif symbol not in mdp_ltlf.transitions[cur_dfa_state]:
+                # target does not have such transition -> failure
+                next_dfa_state = mdp_ltlf.failure_state
+                goal_reward = 0
             else:
                 symbol_to_next_dfa_states = mdp_ltlf.transitions[cur_dfa_state]
                 next_dfa_state_distr = symbol_to_next_dfa_states[symbol]
+                assert len(next_dfa_state_distr) == 1
                 next_dfa_state, _prob = list(next_dfa_state_distr.items())[0]
                 goal_reward = weights[0] * mdp_ltlf.rewards[cur_dfa_state][symbol]
             final_reward = goal_reward + system_reward

@@ -1,8 +1,13 @@
-# Stochastic Service Composition
+# Modeling resilient cyber-physical processes and their composition from digital twins via Markov Decision Processes
 
-Implementation of stochastic service composition.
-Paper with LTLf goals.
+Code for the submission 
+"Modeling resilient cyber-physical processes and their composition from digital twins via Markov Decision Processes".
 
+## Repo structure
+
+- `stochastic_service_composition`: the library; reusable software components of the code.
+- [`docs/notebooks/01-electric-motor-production.ipynb`](https://github.com/luusi/stochastic-service-composition-with-ltlf-goals/blob/main/docs/notebooks/01-electric-motor-production.ipynb):
+  link to the notebook showing the use case described in the paper.
 
 ## Preliminaries
 
@@ -23,7 +28,8 @@ pip install -e .
 - To use rendering functionalities, you will also need to install Graphviz. 
   At [this page](https://www.graphviz.org/download/) you will
   find the releases for all the supported platform.
-  
+
+- Follow the instructions to setup [Logaut](https://github.com/whitemech/logaut) with [Lydia](github.com/whitemech/lydia.git) 
 
 ## Notebooks
 
@@ -33,22 +39,7 @@ To run the notebooks, activate the virtual environment. Then:
 jupyter-notebook
 ```
 
-Then via the browser go to `examples/notebooks` to open the notebooks.
-
-
-## Tests
-
-To run tests: `tox`
-
-To run only the code tests: `tox -e py3.7`
-
-To run only the linters: 
-- `tox -e flake8`
-- `tox -e mypy`
-- `tox -e black-check`
-- `tox -e isort-check`
-
-Please look at the `tox.ini` file for the full list of supported commands. 
+Then via the browser go to `docs/notebooks` to open the notebooks.
 
 ## Docs
 
@@ -59,6 +50,6 @@ and then go to [http://localhost:8000](http://localhost:8000)
 
 ## License
 
-`stochastic_service_composition` is released under the MIT license.
+`stochastic-service-composition-with-ltlf-goals` is released under the MIT license.
 
 Copyright 2022 Luciana Silo

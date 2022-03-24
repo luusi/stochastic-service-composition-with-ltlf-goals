@@ -1,14 +1,10 @@
 site_name: Stochastic Service Composition
-repo_name: 'luusi/stochastic-service-composition'
-repo_url: https://github.com/luusi/stochastic-service-composition
+repo_name: 'luusi/stochastic-service-composition-with-ltlf-goals'
+repo_url: https://github.com/luusi/stochastic-service-composition-with-ltlf-goals
 
 nav:
 - Home: index.md
-- Service: notebooks/01-services.ipynb
-- Target: notebooks/02-target.ipynb
-- Composition MDP: notebooks/03-composition-mdp.ipynb
-- Composition MDP (temporary): notebooks/composition-mdp-smaller.ipynb
-- Use Cases: notebooks/04-use-cases.ipynb
+- Use Cases: notebooks/01-electric-motor-production.ipynb
 
 plugins:
 - mknotebooks:

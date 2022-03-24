@@ -4,7 +4,6 @@ from typing import Callable, Dict
 from graphviz import Digraph
 from mdp_dp_rl.processes.mdp import MDP
 
-from stochastic_service_composition.composition import COMPOSITION_MDP_INITIAL_STATE
 from stochastic_service_composition.services import Service
 from stochastic_service_composition.target import Target
 from stochastic_service_composition.types import Action, State
@@ -17,7 +16,6 @@ def service_to_graphviz(
 ) -> Digraph:
     """
     Transform a service into a graphviz.Digraph object.
-
     :param service: the service object
     :param state2str: a callable that transforms states into strings
     :param action2str: a callable that transforms actions into strings
@@ -55,7 +53,6 @@ def target_to_graphviz(
 ) -> Digraph:
     """
     Transform a target into a graphviz.Digraph object.
-
     :param target: the target object
     :param state2str: a callable that transforms states into strings
     :param action2str: a callable that transforms actions into strings
@@ -95,7 +92,6 @@ def mdp_to_graphviz(
 ) -> Digraph:
     """
     Translate a composition-MDP instance into a Digraph.
-
     :param mdp: the composition-MDP object, obtained from composition.composition_mdp
     :param state2str: a callable that transforms states into strings
     :param action2str: a callable that transforms actions into strings

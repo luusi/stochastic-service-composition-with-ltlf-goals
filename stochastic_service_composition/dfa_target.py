@@ -7,7 +7,7 @@ from pythomata.core import DFA
 from sympy import Symbol
 from sympy.logic.boolalg import And, BooleanFunction, BooleanTrue, Or
 
-from stochastic_service_composition.composition import DEFAULT_GAMMA
+from stochastic_service_composition.constants import DEFAULT_GAMMA, COMPOSITION_MDP_UNDEFINED_ACTION
 from stochastic_service_composition.types import MDPDynamics
 
 
@@ -52,11 +52,13 @@ def mdp_from_dfa(dfa: DFA, reward: float = 2.0, gamma: float = DEFAULT_GAMMA) ->
     for _start in dfa.states:
         for start, action, end in dfa.get_transitions_from(_start):
             if end == failure_state:
-                continue
-            symbols = guard_to_symbol(action)
-            for symbol in symbols:
-                dest = ({end: 1.0}, reward if end in dfa.accepting_states else 0.0)
-                transition_function.setdefault(start, {}).setdefault(symbol, dest)
+                symbol = COMPOSITION_MDP_UNDEFINED_ACTION
+                transition_function.setdefault(start, {}).setdefault(symbol, ({end: 1.0}, 0.0))
+            else:
+                symbols = guard_to_symbol(action)
+                for symbol in symbols:
+                    dest = ({end: 1.0}, reward if end in dfa.accepting_states else 0.0)
+                    transition_function.setdefault(start, {}).setdefault(symbol, dest)
 
     result = MdpDfa(transition_function, gamma)
     result.initial_state = dfa.initial_state

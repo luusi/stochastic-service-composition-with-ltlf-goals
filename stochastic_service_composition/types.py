@@ -1,6 +1,5 @@
 """
 This module contains the main type definitions.
-
 In particular:
 - State is the type of state; we require the
 """

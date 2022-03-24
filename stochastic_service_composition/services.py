@@ -24,9 +24,7 @@ class Service:
     ):
         """
         Initialize the service.
-
         Both states and action must be of an hashable type.
-
         :param states: the set of states
         :param actions: the set of actions
         :param final_states: the final states
@@ -39,6 +37,13 @@ class Service:
         self.initial_state = initial_state
         self.transition_function = transition_function
         self.__post_init__()
+
+    @property
+    def nb_rewards(self) -> int:
+        """Get the number of rewards."""
+        action_to_next_state_info = next(iter(self.transition_function.items()))[1]
+        next_state_dist, rewards = next(iter(action_to_next_state_info.items()))[1]
+        return len(rewards)
 
     def __post_init__(self):
         """Do post-initialization checks."""
@@ -79,7 +84,6 @@ class Service:
     def _check_transition_consistency(self):
         """
         Check consistency of transition function.
-
         In particular:
         - check that every state is contained in the set of states.
         - check that every action is contained in the set of actions.
@@ -111,10 +115,8 @@ def build_deterministic_service_from_transitions(
 ) -> Service:
     """
     Initialize a service from transitions, initial state and final states.
-
     The set of states and the set of actions are parsed from the transition function.
     This will guarantee that all the states are reachable.
-
     :param transition_function: the transition function
     :param initial_state: the initial state
     :param final_states: the final states
@@ -149,10 +151,8 @@ def build_service_from_transitions(
 ) -> Service:
     """
     Initialize a service from transitions, initial state and final states.
-
     The set of states and the set of actions are parsed from the transition function.
     This will guarantee that all the states are reachable.
-
     :param transition_function: the transition function
     :param initial_state: the initial state
     :param final_states: the final states
@@ -178,7 +178,6 @@ def build_service_from_transitions(
 def build_system_service(*services: Service) -> Service:
     """
     Do the build_system_service between services.
-
     :param services: a list of service instances
     :return: the system service
     """

@@ -1,39 +1,18 @@
 from collections import deque
-from typing import Deque, Dict, List, Tuple
-
-import numpy as np
+from typing import Deque, List
 
 from stochastic_service_composition.dfa_target import MdpDfa, guard_to_symbol
 from stochastic_service_composition.services import Service, build_system_service
-from stochastic_service_composition.types import Action, MDPDynamics, State, MOMDPDynamics
-
-
-def get_system_transition_function_by_symbol(
-    system_service: Service,
-) -> Dict[State, Dict[Action, Dict[int, Tuple[Dict[int, float], float]]]]:
-    new_system_transition_function = {}
-    for (
-        start_state,
-        next_transitions_by_action,
-    ) in system_service.transition_function.items():
-        new_trans_by_symbol_and_service = {}
-        for (symbol, service_id), next_trans_dist in next_transitions_by_action.items():
-            new_trans_by_symbol_and_service.setdefault(symbol, {})[
-                service_id
-            ] = next_trans_dist
-        new_system_transition_function[start_state] = new_trans_by_symbol_and_service
-    return new_system_transition_function
+from stochastic_service_composition.types import MDPDynamics
 
 
 def compute_final_mdp(
-    mdp_ltlf: MdpDfa, services: List[Service], weights: List[float]
+    mdp_ltlf: MdpDfa, services: List[Service], weights: List[float], with_all_initial_states: bool = False
 ) -> MdpDfa:
-    assert len(weights) == len(services) + 1
+    assert all(service.nb_rewards for service in services)
+    assert len(weights) == services[0].nb_rewards + 1
 
     system_service = build_system_service(*services)
-    system_transition_function_by_symbol = get_system_transition_function_by_symbol(
-        system_service
-    )
 
     transition_function: MDPDynamics = {}
 
@@ -45,6 +24,12 @@ def compute_final_mdp(
     initial_state = (system_service.initial_state, mdp_ltlf.initial_state)
     queue.append(initial_state)
     to_be_visited.add(initial_state)
+    if with_all_initial_states:
+        for system_service_state in system_service.states:
+            if system_service_state == system_service.initial_state: continue
+            new_initial_state = (system_service_state, mdp_ltlf.initial_state)
+            queue.append(new_initial_state)
+            to_be_visited.add(new_initial_state)
 
     while len(queue) > 0:
         cur_state = queue.popleft()
@@ -67,9 +52,15 @@ def compute_final_mdp(
                 # it is a tau action
                 next_dfa_state = cur_dfa_state
                 goal_reward = 0.0
+            # not a tau action -> check we can
+            elif symbol not in mdp_ltlf.transitions[cur_dfa_state]:
+                # target does not have such transition -> failure
+                next_dfa_state = mdp_ltlf.failure_state
+                goal_reward = 0
             else:
                 symbol_to_next_dfa_states = mdp_ltlf.transitions[cur_dfa_state]
                 next_dfa_state_distr = symbol_to_next_dfa_states[symbol]
+                assert len(next_dfa_state_distr) == 1
                 next_dfa_state, _prob = list(next_dfa_state_distr.items())[0]
                 goal_reward = weights[0] * mdp_ltlf.rewards[cur_dfa_state][symbol]
             final_reward = goal_reward + system_reward

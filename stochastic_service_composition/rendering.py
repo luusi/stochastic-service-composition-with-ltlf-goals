@@ -4,7 +4,6 @@ from typing import Callable, Dict
 from graphviz import Digraph
 from mdp_dp_rl.processes.mdp import MDP
 
-from stochastic_service_composition.composition import COMPOSITION_MDP_INITIAL_STATE
 from stochastic_service_composition.services import Service
 from stochastic_service_composition.target import Target
 from stochastic_service_composition.types import Action, State

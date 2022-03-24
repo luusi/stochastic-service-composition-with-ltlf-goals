@@ -7,7 +7,7 @@ from pythomata.core import DFA
 from sympy import Symbol
 from sympy.logic.boolalg import And, BooleanFunction, BooleanTrue, Or
 
-from stochastic_service_composition.composition import DEFAULT_GAMMA, COMPOSITION_MDP_UNDEFINED_ACTION
+from stochastic_service_composition.constants import DEFAULT_GAMMA, COMPOSITION_MDP_UNDEFINED_ACTION
 from stochastic_service_composition.types import MDPDynamics
 
 

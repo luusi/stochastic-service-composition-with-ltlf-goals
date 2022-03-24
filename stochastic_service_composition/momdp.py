@@ -1,7 +1,7 @@
 from collections import deque
 from typing import Deque, List
 
-from stochastic_service_composition.dfa_target import MdpDfa
+from stochastic_service_composition.dfa_target import MdpDfa, guard_to_symbol
 from stochastic_service_composition.services import Service, build_system_service
 from stochastic_service_composition.types import MDPDynamics
 
